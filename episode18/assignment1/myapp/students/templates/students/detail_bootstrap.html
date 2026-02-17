@@ -1,0 +1,65 @@
+{% extends 'students/base.html' %}
+
+{% block title %}{{ student.name }} - Student Details{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <h1 class="mb-4">
+            <i class="fas fa-user-circle"></i> Student Details
+        </h1>
+        
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-user-graduate"></i> {{ student.name }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h6 class="text-muted">
+                            <i class="fas fa-id-card"></i> Roll Number
+                        </h6>
+                        <p class="lead">{{ student.roll_no }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted">
+                            <i class="fas fa-envelope"></i> Email
+                        </h6>
+                        <p class="lead">{{ student.email }}</p>
+                    </div>
+                </div>
+                <hr>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h6 class="text-muted">
+                            <i class="fas fa-money-bill"></i> Fees Status
+                        </h6>
+                        {% if student.fees_paid %}
+                            <span class="badge bg-success fs-6">
+                                <i class="fas fa-check-circle"></i> Paid
+                            </span>
+                        {% else %}
+                            <span class="badge bg-danger fs-6">
+                                <i class="fas fa-exclamation-circle"></i> Pending
+                            </span>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted">
+                            <i class="fas fa-calendar"></i> Enrollment Date
+                        </h6>
+                        <p>{{ student.created_at|date:"d-m-Y H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-light">
+                <a href="{% url 'student_list' %}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

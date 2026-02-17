@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Course Management{% endblock %}</title>
+    
+    <!-- Bootswatch Theme CSS from CDN -->
+    <!-- TODO 1: Add Bootswatch CDN link here
+         Choose from: darkly, flatly, journal, lumen, lux, materia, minty, etc.
+         https://cdn.jsdelivr.net/npm/bootswatch@5.3.0/dist/[THEME]/bootstrap.min.css
+    -->
+    
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'courses/css/style.css' %}">
+</head>
+<body>
+    <!-- TODO 2: Add Navbar Component
+         - navbar with navbar-expand-lg, navbar-dark, bg-dark
+         - Brand: "Course Management" with graduation cap icon
+         - Nav items: Students, Courses, Enrollments
+         - Each nav item with Font Awesome icon
+         - Responsive hamburger menu
+    -->
+    
+    <!-- Main Content -->
+    <main class="py-4">
+        <div class="container-fluid">
+            {% block breadcrumb %}{% endblock %}
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+    
+    <!-- TODO 3: Add Footer Component
+         - Dark background with text-white
+         - Copyright with current year (use JS)
+         - Social icons with Font Awesome (GitHub, Twitter, LinkedIn)
+         - Text: "Built with Bootstrap, Django, and Font Awesome"
+    -->
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="{% static 'courses/js/main.js' %}"></script>
+</body>
+</html>

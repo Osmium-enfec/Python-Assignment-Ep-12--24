@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Course Management{% endblock %}</title>
+    
+    <!-- Bootswatch Theme CSS from CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.0/dist/darkly/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'courses/css/style.css' %}">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'course_list' %}">
+                <i class="fas fa-graduation-cap"></i> Course Management
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'student_list' %}">
+                            <i class="fas fa-users"></i> Students
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'course_list' %}">
+                            <i class="fas fa-book"></i> Courses
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'enrollment_list' %}">
+                            <i class="fas fa-clipboard-list"></i> Enrollments
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="py-4">
+        <div class="container-fluid">
+            {% block breadcrumb %}{% endblock %}
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-dark text-white mt-5 py-4 border-top">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">
+                        <i class="fas fa-copyright"></i> <span id="year"></span> Course Management System
+                    </p>
+                    <small class="text-muted">Built with Bootstrap, Django, and Font Awesome</small>
+                </div>
+                <div class="col-md-6 text-end">
+                    <a href="#" class="text-white me-2" title="GitHub">
+                        <i class="fab fa-github fa-lg"></i>
+                    </a>
+                    <a href="#" class="text-white me-2" title="Twitter">
+                        <i class="fab fa-twitter fa-lg"></i>
+                    </a>
+                    <a href="#" class="text-white" title="LinkedIn">
+                        <i class="fab fa-linkedin fa-lg"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="{% static 'courses/js/main.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Detail</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .card { border: 1px solid #ddd; padding: 20px; max-width: 800px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #2196F3; color: white; }
+        a { color: #2196F3; }
+    </style>
+</head>
+<body>
+    <h1>Student Detail</h1>
+    
+    <div class="card">
+        <h2>{{ student.name }}</h2>
+        <p><strong>Roll No:</strong> {{ student.roll_no }}</p>
+        <p><strong>Email:</strong> {{ student.email }}</p>
+        
+        <h3>Enrolled Courses</h3>
+        {% if enrollments %}
+        <table>
+            <tr>
+                <th>Code</th>
+                <th>Title</th>
+                <th>Credits</th>
+                <th>Grade</th>
+            </tr>
+            {% for enrollment in enrollments %}
+            <tr>
+                <td>{{ enrollment.course.code }}</td>
+                <td>{{ enrollment.course.title }}</td>
+                <td>{{ enrollment.course.credits }}</td>
+                <td>{{ enrollment.grade|default:"Pending" }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p>No courses enrolled.</p>
+        {% endif %}
+    </div>
+    
+    <p><a href="{% url 'student_list' %}">← Back to Student List</a></p>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Detail</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .card { border: 1px solid #ddd; padding: 20px; max-width: 600px; }
+        .field { margin: 10px 0; }
+        .label { font-weight: bold; }
+        .value { color: #333; }
+        a { color: #4CAF50; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>Student Detail</h1>
+    
+    <div class="card">
+        <div class="field">
+            <span class="label">Name:</span>
+            <span class="value">{{ student.name }}</span>
+        </div>
+        <div class="field">
+            <span class="label">Roll No:</span>
+            <span class="value">{{ student.roll_no }}</span>
+        </div>
+        <div class="field">
+            <span class="label">Email:</span>
+            <span class="value">{{ student.email }}</span>
+        </div>
+        <div class="field">
+            <span class="label">Fees Paid:</span>
+            <span class="value">{% if student.fees_paid %}Yes{% else %}No{% endif %}</span>
+        </div>
+        <div class="field">
+            <span class="label">Created At:</span>
+            <span class="value">{{ student.created_at|date:"d-m-Y H:i" }}</span>
+        </div>
+    </div>
+    
+    <p><a href="{% url 'student_list' %}">← Back to Student List</a></p>
+</body>
+</html>
