@@ -6,6 +6,7 @@ Tests for routing, redirects, templates, and PRG pattern
 import unittest
 import json
 import os
+import socket
 from urllib.parse import urlencode
 from http.server import ThreadingHTTPServer
 import threading
@@ -14,6 +15,11 @@ import requests
 from solution import ServerHandler
 import stores
 import page
+
+
+# Custom server class that allows address reuse
+class ReuseAddrHTTPServer(ThreadingHTTPServer):
+    allow_reuse_address = True
 
 
 class TestPageTemplates(unittest.TestCase):
@@ -115,8 +121,7 @@ class TestServerHandler(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Start server"""
-        cls.server = ThreadingHTTPServer(('localhost', 8008), ServerHandler)
-        cls.server.allow_reuse_address = True
+        cls.server = ReuseAddrHTTPServer(('localhost', 8008), ServerHandler)
         cls.server_thread = threading.Thread(target=cls.server.serve_forever)
         cls.server_thread.daemon = True
         cls.server_thread.start()
