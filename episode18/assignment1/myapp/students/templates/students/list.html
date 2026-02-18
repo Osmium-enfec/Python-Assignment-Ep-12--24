@@ -11,13 +11,36 @@
     </div>
 </div>
 
-<!-- TODO 3: Create student list with Bootstrap cards
-     - Use .row and .col-md-6 for responsive grid
-     - Create .card for each student
-     - Show: name, roll_no, email, fees_paid status
-     - Add .badge for fees status (badge-success or badge-danger)
-     - Add view button with fa-eye icon
-     - Use empty state if no students
--->
+{% if students %}
+<div class="row">
+    {% for student in students %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ student.name }}</h5>
+                <p class="card-text">
+                    <small class="text-muted">Roll No: {{ student.roll_no }}</small><br>
+                    <small class="text-muted">Email: {{ student.email }}</small>
+                </p>
+                <div class="mb-3">
+                    {% if student.fees_paid %}
+                        <span class="badge bg-success"><i class="fas fa-check-circle"></i> Fees Paid</span>
+                    {% else %}
+                        <span class="badge bg-danger"><i class="fas fa-times-circle"></i> Fees Pending</span>
+                    {% endif %}
+                </div>
+                <a href="{% url 'student_detail' student.id %}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-eye"></i> View
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="fas fa-info-circle"></i> No students found.
+</div>
+{% endif %}
 
 {% endblock %}

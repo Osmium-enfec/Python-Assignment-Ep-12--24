@@ -5,19 +5,33 @@
 {% block content %}
 <div class="row">
     <div class="col-lg-8 mx-auto">
-        <h1 class="mb-4">
-            <i class="fas fa-user-circle"></i> Student Details
-        </h1>
+        <a href="{% url 'student_list' %}" class="btn btn-secondary mb-3">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
         
-        <!-- TODO 4: Create detail card with Bootstrap
-             - Use .card with shadow
-             - Display student info in card body
-             - Use .badge for fees status
-             - Add Font Awesome icons for fields
-             - Format date with date filter
-             - Add back button with fa-arrow-left icon
-        -->
-        
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white">
+                <h2 class="mb-0"><i class="fas fa-user-circle"></i> {{ student.name }}</h2>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p><strong><i class="fas fa-id-card"></i> Roll No:</strong> {{ student.roll_no }}</p>
+                        <p><strong><i class="fas fa-envelope"></i> Email:</strong> {{ student.email }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong><i class="fas fa-calendar"></i> Joined:</strong> {{ student.created_at|date:"M d, Y" }}</p>
+                        <p><strong><i class="fas fa-money-bill"></i> Fees Status:</strong>
+                            {% if student.fees_paid %}
+                                <span class="badge bg-success"><i class="fas fa-check-circle"></i> Paid</span>
+                            {% else %}
+                                <span class="badge bg-danger"><i class="fas fa-times-circle"></i> Pending</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
