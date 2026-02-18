@@ -1,0 +1,159 @@
+{% extends 'students/base.html' %}
+
+{% block title %}{{ student.name }} - Student Details{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-lg-8 mx-auto">
+        <a href="{% url 'student_list' %}" class="btn btn-secondary mb-3">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+
+        <!-- Student Profile Card -->
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">
+                <h2 class="mb-0">
+                    <i class="fas fa-user-circle"></i> {{ student.name }}
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Roll Number:</strong> {{ student.roll_no }}<br>
+                        <strong>Email:</strong> {{ student.email }}<br>
+                        <strong>Phone:</strong> {{ student.phone }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Date of Birth:</strong> {{ student.date_of_birth }}<br>
+                        <strong>GPA:</strong> 
+                        <span class="badge bg-primary">{{ student.gpa }}</span>
+                        <span class="badge bg-info">{{ student.gpa_grade }}</span><br>
+                        <strong>Status:</strong>
+                        {% if student.status == 'active' %}
+                            <span class="badge bg-success">Active</span>
+                        {% elif student.status == 'inactive' %}
+                            <span class="badge bg-secondary">Inactive</span>
+                        {% else %}
+                            <span class="badge bg-info">Graduated</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Conditional Alerts -->
+                {% if student.is_dean_list %}
+                    <div class="alert alert-success">
+                        <i class="fas fa-star"></i> <strong>Excellent!</strong> This student qualifies for Dean's List (GPA ≥ 3.5)
+                    </div>
+                {% endif %}
+
+                {% if student.is_at_risk %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i> <strong>At Risk!</strong> This student's GPA is below 2.0 and may be subject to academic probation
+                    </div>
+                {% endif %}
+
+                {% if student.gpa >= 3.0 and not student.is_dean_list %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Good academic standing with GPA ≥ 3.0
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Grades Table -->
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h3 class="mb-0">
+                    <i class="fas fa-table"></i> Academic Grades
+                </h3>
+            </div>
+
+            {% if grades %}
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">Course</th>
+                                    <th scope="col">Score</th>
+                                    <th scope="col">Grade</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Semester</th>
+                                    <th scope="col">Year</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for grade in grades %}
+                                <tr 
+                                    {% if grade.score >= 90 %}
+                                        class="table-success"
+                                    {% elif grade.score >= 80 %}
+                                        class="table-info"
+                                    {% elif grade.score >= 70 %}
+                                        class=""
+                                    {% elif grade.score >= 60 %}
+                                        class="table-warning"
+                                    {% else %}
+                                        class="table-danger"
+                                    {% endif %}
+                                >
+                                    <td><strong>{{ grade.course.code }}</strong></td>
+                                    <td>{{ grade.score }}</td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ grade.letter_grade }}</span>
+                                    </td>
+                                    <td>
+                                        {% if grade.is_passing %}
+                                            <span class="badge bg-success">Passing</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Failing</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ grade.get_semester_display }}</td>
+                                    <td>{{ grade.year }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Grade Summary -->
+                <div class="card-footer bg-light">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Total Grades:</strong> {{ total_grades }}
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <strong>Passing Grades:</strong> 
+                            <span class="badge bg-success">{{ passing_grades }}</span> /
+                            <span class="badge bg-secondary">{{ total_grades }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Conditional Summary -->
+                    {% if passing_grades == total_grades %}
+                        <div class="alert alert-success mt-2 mb-0">
+                            <i class="fas fa-check-circle"></i> Perfect record - all grades are passing!
+                        </div>
+                    {% elif passing_grades == 0 %}
+                        <div class="alert alert-danger mt-2 mb-0">
+                            <i class="fas fa-times-circle"></i> No passing grades - student needs academic support
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning mt-2 mb-0">
+                            <i class="fas fa-exclamation-circle"></i> {{ passing_grades }}/{{ total_grades }} grades are passing
+                        </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> No grades recorded yet.
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

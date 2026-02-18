@@ -1,0 +1,76 @@
+{% extends 'students/base.html' %}
+
+{% block title %}Home - Student Management System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-lg-10 mx-auto">
+        <h1 class="display-4 mb-4">
+            <i class="fas fa-dashboard"></i> Dashboard
+        </h1>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-5">
+            <div class="col-md-4 mb-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-users"></i> Total Students</h5>
+                        <p class="card-text display-6">{{ total_students }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-check-circle"></i> Active Students</h5>
+                        <p class="card-text display-6">{{ active_students }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-star"></i> Dean's List</h5>
+                        <p class="card-text display-6">{{ dean_list_count }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conditional Example -->
+        {% if total_students > 0 %}
+            <div class="alert alert-info">
+                <h5><i class="fas fa-info-circle"></i> System Status</h5>
+                <p>The system has <strong>{{ total_students }}</strong> total students.</p>
+                
+                <!-- Nested Conditional -->
+                {% if active_students == total_students %}
+                    <p class="text-success"><i class="fas fa-check"></i> All students are currently active.</p>
+                {% elif active_students > 0 %}
+                    <p><i class="fas fa-exclamation"></i> {{ active_students }} out of {{ total_students }} students are active.</p>
+                {% else %}
+                    <p class="text-danger"><i class="fas fa-times"></i> No students are currently active.</p>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i> No students found in the system.
+            </div>
+        {% endif %}
+
+        <!-- Quick Links -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <a href="{% url 'student_list' %}" class="btn btn-primary btn-lg w-100">
+                    <i class="fas fa-list"></i> View All Students
+                </a>
+            </div>
+            <div class="col-md-6">
+                <a href="{% url 'grade_report' %}" class="btn btn-success btn-lg w-100">
+                    <i class="fas fa-chart-bar"></i> View Grade Report
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

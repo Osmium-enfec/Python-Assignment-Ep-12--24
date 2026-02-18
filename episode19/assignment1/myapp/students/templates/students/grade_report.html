@@ -1,0 +1,154 @@
+{% extends 'students/base.html' %}
+
+{% block title %}Grade Report - Student Management System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <h1 class="mb-4">
+            <i class="fas fa-chart-bar"></i> Grade Report
+        </h1>
+
+        <!-- Filter Form -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-filter"></i> Filter Grades</h5>
+            </div>
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="semester" class="form-label">Semester:</label>
+                        <select name="semester" id="semester" class="form-select">
+                            <option value="">All Semesters</option>
+                            <option value="fall" {% if semester == 'fall' %}selected{% endif %}>Fall</option>
+                            <option value="spring" {% if semester == 'spring' %}selected{% endif %}>Spring</option>
+                            <option value="summer" {% if semester == 'summer' %}selected{% endif %}>Summer</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="year" class="form-label">Year:</label>
+                        <input type="number" name="year" id="year" class="form-control" 
+                               value="{% if year %}{{ year }}{% endif %}" placeholder="e.g., 2024">
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search"></i> Filter
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Grade Statistics -->
+        {% if total_grades > 0 %}
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Total Grades</h5>
+                            <p class="display-6">{{ total_grades }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Passing</h5>
+                            <p class="display-6 text-success">{{ passing }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Failing</h5>
+                            <p class="display-6 text-danger">{{ total_grades|add:passing|add:passing }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Grades Table -->
+        {% if grades %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col">Student</th>
+                            <th scope="col">Course</th>
+                            <th scope="col">Score</th>
+                            <th scope="col">Grade</th>
+                            <th scope="col" class="text-center">Status</th>
+                            <th scope="col">Semester</th>
+                            <th scope="col">Year</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for grade in grades %}
+                        <tr 
+                            {% if grade.score >= 90 %}
+                                class="table-success"
+                            {% elif grade.score >= 80 %}
+                                class="table-info"
+                            {% elif grade.score >= 70 %}
+                                class=""
+                            {% elif grade.score >= 60 %}
+                                class="table-warning"
+                            {% else %}
+                                class="table-danger"
+                            {% endif %}
+                        >
+                            <td>
+                                <a href="{% url 'student_detail' grade.student.pk %}">
+                                    {{ grade.student.name }}
+                                </a>
+                            </td>
+                            <td>{{ grade.course.code }}: {{ grade.course.name }}</td>
+                            <td class="text-center">
+                                <strong>{{ grade.score }}</strong>
+                            </td>
+                            <td class="text-center">
+                                {% if grade.score >= 90 %}
+                                    <span class="badge bg-success">{{ grade.letter_grade }}</span>
+                                {% elif grade.score >= 80 %}
+                                    <span class="badge bg-info">{{ grade.letter_grade }}</span>
+                                {% elif grade.score >= 70 %}
+                                    <span class="badge bg-primary">{{ grade.letter_grade }}</span>
+                                {% elif grade.score >= 60 %}
+                                    <span class="badge bg-warning text-dark">{{ grade.letter_grade }}</span>
+                                {% else %}
+                                    <span class="badge bg-danger">{{ grade.letter_grade }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if grade.is_passing %}
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check-circle"></i> Passing
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-times-circle"></i> Failing
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>{{ grade.get_semester_display }}</td>
+                            <td class="text-center">{{ grade.year }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> 
+                {% if semester or year %}
+                    No grades found matching your filters. Try adjusting your search criteria.
+                {% else %}
+                    No grades found in the system.
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
