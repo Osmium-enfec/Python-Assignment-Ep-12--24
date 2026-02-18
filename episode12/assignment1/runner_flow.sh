@@ -1,38 +1,23 @@
 #!/bin/bash
 
 # Episode 12 - Assignment 1: Form Data Processing & HTTP Request Handling
-# Simple bash runner that outputs JSON results
+# Optimized runner for portal environments with resource constraints
 
 set +e  # Don't exit on errors
 cd /app
 
-# Ensure we have enough resources
+# Memory-efficient Python environment
 export PYTHONUNBUFFERED=1
 export PYTHONDONTWRITEBYTECODE=1
 
-# Run pytest with minimal output overhead
-timeout 120 pytest test_assignment.py -v --tb=short 2>&1 > /tmp/pytest_output.txt
-PYTEST_EXIT=$?
+# Run pytest WITHOUT timeout - let portal control execution
+# Use minimal output, no header/footer overhead
+pytest test_assignment.py -v --tb=no -p no:cacheprovider 2>&1 > /tmp/pytest_output.txt &
+PYTEST_PID=$!
 
-# If pytest times out or fails hard, still try to output something
-if [ $PYTEST_EXIT -eq 137 ] || [ $PYTEST_EXIT -eq 124 ]; then
-    # Killed or timeout - output error JSON
-    cat > /tmp/results_error.json << 'EOF'
-{
-  "tests": [],
-  "summary": {
-    "total": 0,
-    "passed": 0,
-    "failed": 0,
-    "percentage": 0,
-    "marks": 0
-  },
-  "error": "Test execution timeout or killed (exit 137/124)"
-}
-EOF
-    cat /tmp/results_error.json
-    exit 0
-fi
+# Wait for pytest but be ready to output partial results
+wait $PYTEST_PID 2>/dev/null
+PYTEST_EXIT=$?
 
 # Parse output and generate JSON using Python
 python3 << 'PYTHON_EOF'
@@ -42,26 +27,30 @@ import sys
 import os
 
 try:
-    # Read pytest output from file
-    if not os.path.exists('/tmp/pytest_output.txt'):
-        output = ""
-    else:
+    # Read pytest output
+    output = ""
+    if os.path.exists('/tmp/pytest_output.txt'):
         with open('/tmp/pytest_output.txt', 'r') as f:
             output = f.read()
     
-    # Parse test results using regex
+    # Parse ALL test results (including partial output)
     tests = []
+    seen_tests = set()
+    
     for line in output.split('\n'):
         # Match: test_assignment.py::TestFormHandler::test_name PASSED or FAILED
         match = re.search(r'test_assignment\.py::TestFormHandler::(\w+)\s+(PASSED|FAILED)', line)
         if match:
             test_name = match.group(1)
-            status = 'passed' if match.group(2) == 'PASSED' else 'failed'
-            tests.append({
-                'name': test_name,
-                'status': status,
-                'passed': status == 'passed'
-            })
+            # Avoid duplicates
+            if test_name not in seen_tests:
+                seen_tests.add(test_name)
+                status = 'passed' if match.group(2) == 'PASSED' else 'failed'
+                tests.append({
+                    'name': test_name,
+                    'status': status,
+                    'passed': status == 'passed'
+                })
     
     # Calculate summary
     total = len(tests)
@@ -70,7 +59,7 @@ try:
     percentage = (passed / total * 100) if total > 0 else 0
     marks = passed / total if total > 0 else 0
     
-    # Build JSON result
+    # Build result
     result = {
         'tests': tests,
         'summary': {
@@ -81,21 +70,19 @@ try:
             'marks': round(marks, 2)
         }
     }
+    
+    # Flag if partial output
+    if total < 11:
+        result['note'] = 'Partial execution - portal may have timeout'
 
 except Exception as e:
     result = {
         'tests': [],
-        'summary': {
-            'total': 0,
-            'passed': 0,
-            'failed': 0,
-            'percentage': 0,
-            'marks': 0
-        },
+        'summary': {'total': 0, 'passed': 0, 'failed': 0, 'percentage': 0, 'marks': 0},
         'error': str(e)
     }
 
-# Output JSON
+# Output JSON immediately
 sys.stdout.write(json.dumps(result, indent=2))
 sys.stdout.write('\n')
 sys.stdout.flush()
