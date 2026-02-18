@@ -5,28 +5,34 @@
 
 cd /app
 
-# Run pytest and save output to file (no tee)
-pytest test_assignment.py -v --tb=short > /tmp/pytest_output.txt 2>&1
+# Run pytest and save output to file
+pytest test_assignment.py -v --tb=short 2>&1 > /tmp/pytest_output.txt
 PYTEST_EXIT=$?
 
-# Verify file has content
-if [ ! -s /tmp/pytest_output.txt ]; then
-    echo '{"error": "pytest output file is empty"}'
-    exit 1
-fi
+# Save exit code
+echo $PYTEST_EXIT > /tmp/pytest_exit.txt
 
 # Parse output and generate JSON using Python
 python3 << 'PYTHON_EOF'
 import json
 import re
 import sys
+import os
 
 try:
     # Read pytest output from file
     with open('/tmp/pytest_output.txt', 'r') as f:
         output = f.read()
     
-    # Parse test results using regex - look for the test line pattern
+    # Get pytest exit code
+    pytest_exit = 0
+    try:
+        with open('/tmp/pytest_exit.txt', 'r') as f:
+            pytest_exit = int(f.read().strip())
+    except:
+        pytest_exit = -1
+    
+    # Parse test results using regex
     tests = []
     for line in output.split('\n'):
         # Match: test_assignment.py::TestFormHandler::test_name PASSED or FAILED
@@ -58,14 +64,6 @@ try:
             'marks': round(marks, 2)
         }
     }
-    
-    # If tests found is less than expected, add debug info
-    if total < 11:
-        result['debug'] = {
-            'file_size': len(output),
-            'file_lines': len(output.split('\n')),
-            'pytest_exit_code': sys.argv[1] if len(sys.argv) > 1 else 'unknown'
-        }
 
 except Exception as e:
     import traceback
@@ -78,12 +76,10 @@ except Exception as e:
             'percentage': 0,
             'marks': 0
         },
-        'error': str(e),
-        'traceback': traceback.format_exc()
+        'error': str(e)
     }
 
-# Output JSON to stdout with explicit encoding
-import sys
+# Output JSON to stdout
 sys.stdout.write(json.dumps(result, indent=2))
 sys.stdout.write('\n')
 sys.stdout.flush()
