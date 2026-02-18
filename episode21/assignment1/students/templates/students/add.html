@@ -1,0 +1,68 @@
+{% extends "students/base.html" %}
+
+{% load static %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-user-plus"></i> Add New Student</h4>
+            </div>
+            <div class="card-body">
+                <!-- Topic 38: Template Form Rendering -->
+                <!-- Topic 51: CSRF Protection in POST -->
+                <form method="POST" novalidate>
+                    {% csrf_token %}  <!-- Topic 40: {% csrf_token %} Tag -->
+                    
+                    <!-- Topic 55-57: {{ form.field }} and error rendering -->
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <!-- Topic 56: {{ form.field.label }} Rendering -->
+                        {{ field.label_tag }}
+                        
+                        <!-- Topic 55: {{ form.field }} Rendering -->
+                        {{ field }}
+                        
+                        <!-- Topic 57-58: Field Error Display -->
+                        {% if field.errors %}
+                        <!-- Topic 59-64: Error Styling with Bootstrap -->
+                        <div class="invalid-feedback d-block">
+                            {% for error in field.errors %}
+                            <i class="fas fa-exclamation-circle"></i> {{ error }}<br>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Topic 22: Form Help Text -->
+                        {% if field.help_text %}
+                        <small class="form-text text-muted d-block mt-1">
+                            {{ field.help_text|safe }}
+                        </small>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    
+                    <!-- Topic 59: Non-Field Errors Display -->
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <i class="fas fa-exclamation-triangle"></i> {{ error }}<br>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Add Student
+                        </button>
+                        <a href="{% url 'students:list' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

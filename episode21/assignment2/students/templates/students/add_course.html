@@ -1,0 +1,57 @@
+{% extends "students/base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-plus-circle"></i> Add New Course</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+                    
+                    {% for field in form %}
+                    <div class="mb-3">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        
+                        {% if field.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in field.errors %}
+                            <i class="fas fa-exclamation-circle"></i> {{ error }}<br>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        {% if field.help_text %}
+                        <small class="form-text text-muted d-block mt-1">
+                            {{ field.help_text|safe }}
+                        </small>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        <strong>Validation Errors:</strong>
+                        {% for error in form.non_field_errors %}
+                        <br><i class="fas fa-exclamation-triangle"></i> {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Add Course
+                        </button>
+                        <a href="{% url 'students:course_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
