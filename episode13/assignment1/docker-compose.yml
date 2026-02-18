@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  judge:
+    image: ep13-assignment1-x86:latest
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    tmpfs:
+      - /tmp:size=50M,noexec,nosuid
+    networks:
+      - judge-network
+    command: /bin/sh -c "/app/runner_flow.sh"
+
+networks:
+  judge-network:
+    driver: bridge
