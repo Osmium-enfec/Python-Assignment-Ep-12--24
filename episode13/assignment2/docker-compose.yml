@@ -10,10 +10,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
-          memory: 512M
+          cpus: '2'
+          memory: 1G
     tmpfs:
-      - /tmp:size=50M,noexec,nosuid
+      - /tmp:size=200M,noexec,nosuid
     networks:
       - judge-network
     command: /bin/sh -c "/app/runner_flow.sh"

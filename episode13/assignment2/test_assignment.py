@@ -6,6 +6,7 @@ Tests for routing, redirects, templates, and PRG pattern
 import unittest
 import json
 import os
+import sys
 import socket
 from urllib.parse import urlencode
 from http.server import ThreadingHTTPServer
@@ -143,10 +144,14 @@ class TestServerHandler(unittest.TestCase):
     def tearDownClass(cls):
         """Shutdown server"""
         try:
+            # Close session properly
+            if hasattr(cls, 'session'):
+                cls.session.close()
+            # Shutdown server
             cls.server.shutdown()
             cls.server.server_close()
-        except:
-            pass
+        except Exception as e:
+            print(f"Teardown error: {e}", file=sys.stderr)
         time.sleep(0.2)
     
     def setUp(self):

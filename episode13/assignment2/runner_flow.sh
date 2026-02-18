@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Episode 13 - Assignment 2: Routing, Templates & PRG Pattern
-# Portal-optimized runner matching Assignment 1 format
+# Portal-optimized runner with debugging
 
 set +e
 cd /app
@@ -10,9 +10,18 @@ cd /app
 export PYTHONUNBUFFERED=1
 export PYTHONDONTWRITEBYTECODE=1
 
+# Debug: Check available memory before test
+echo "DEBUG: Memory before pytest:" >&2
+free -h >&2 || true
+
 # Run pytest with aggressive timeout (90 seconds) to prevent hanging
 timeout 90 pytest test_assignment.py -v --tb=no -p no:cacheprovider 2>&1 > /tmp/pytest_output.txt
 PYTEST_EXIT=$?
+
+# Debug: Check if pytest succeeded
+echo "DEBUG: Pytest exit code: $PYTEST_EXIT" >&2
+echo "DEBUG: Output file size: $(wc -c < /tmp/pytest_output.txt 2>/dev/null || echo 'N/A') bytes" >&2
+head -20 /tmp/pytest_output.txt >&2 || true
 
 # Parse output and generate JSON using Python
 python3 << 'PYTHON_EOF'
