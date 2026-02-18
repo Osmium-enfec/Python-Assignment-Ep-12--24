@@ -80,9 +80,13 @@ result = {
 if note:
     result["note"] = note
 
-# Output ONLY JSON to stdout (this is what portal captures)
+# Output JSON to stdout (portal captures)
 print(json.dumps(result, indent=2))
 sys.stdout.flush()
+
+# Also save to file for portal backup
+with open('/app/results.json', 'w') as f:
+    json.dump(result, f, indent=2)
 
 PYTHON_EOF
 
