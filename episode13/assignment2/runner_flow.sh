@@ -4,11 +4,8 @@ cd /app
 export PYTHONUNBUFFERED=1
 export PYTHONDONTWRITEBYTECODE=1
 
-# RUN pytest WITHOUT timeout - let portal control execution
-pytest test_assignment.py -v --tb=no -p no:cacheprovider 2>&1 > /tmp/pytest_output.txt &
-PYTEST_PID=$!
-
-wait $PYTEST_PID 2>/dev/null
+# RUN pytest with timeout to prevent server hanging tests from stalling
+timeout 60 pytest test_assignment.py -v --tb=short -p no:cacheprovider 2>&1 | tee /tmp/pytest_output.txt
 PYTEST_EXIT=$?
 
 # Python subprocess parses output and generates JSON
