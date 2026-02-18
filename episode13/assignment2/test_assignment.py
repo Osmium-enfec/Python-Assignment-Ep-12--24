@@ -116,6 +116,7 @@ class TestServerHandler(unittest.TestCase):
     def setUpClass(cls):
         """Start server"""
         cls.server = ThreadingHTTPServer(('localhost', 8008), ServerHandler)
+        cls.server.allow_reuse_address = True
         cls.server_thread = threading.Thread(target=cls.server.serve_forever)
         cls.server_thread.daemon = True
         cls.server_thread.start()
