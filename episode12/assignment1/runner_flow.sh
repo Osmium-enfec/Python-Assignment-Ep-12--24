@@ -4,9 +4,17 @@
 # Runner flow - executed inside Docker container at /app/runner.sh
 # Outputs results in JSON format with test cases and summary
 
+set -e
+
 cd /app
 
-# Run the Python test results generator with unbuffered output
+# Set Python to unbuffered mode
 export PYTHONUNBUFFERED=1
-exec python3 -u /app/generate_results.py
+
+# Run the Python test results generator
+# Save output to both a log file and stdout
+python3 -u /app/generate_results.py 2>&1 | tee /app/runner.log
+
+# Exit successfully even if tests fail (we captured the results)
+exit 0
 

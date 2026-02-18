@@ -6,52 +6,42 @@ import subprocess
 import json
 import sys
 import os
+import re
 
 def run_tests():
-    """Run pytest and capture output"""
-    # Run pytest with verbose output
-    result = subprocess.run(
-        ["pytest", "test_assignment.py", "-v"],
-        capture_output=True,
-        text=True
-    )
-    return result.stdout, result.stderr, result.returncode
+    """Run pytest and save output to file, then capture"""
+    # Run pytest and save output to file first
+    with open('/app/pytest_output.txt', 'w') as f:
+        result = subprocess.run(
+            ["pytest", "test_assignment.py", "-v", "--tb=line"],
+            stdout=f,
+            stderr=subprocess.STDOUT,
+            text=True
+        )
+    
+    # Read the saved output
+    with open('/app/pytest_output.txt', 'r') as f:
+        output = f.read()
+    
+    return output, result.returncode
 
-def parse_pytest_output(stdout, stderr):
+def parse_pytest_output(output):
     """Parse pytest output to extract test results"""
     tests = []
     
-    # Combine both outputs for parsing
-    full_output = stdout + "\n" + stderr
+    lines = output.split('\n')
     
-    # Split by lines and look for test results
-    lines = full_output.split('\n')
     for line in lines:
-        # Look for lines with test names and PASSED/FAILED
-        if 'test_assignment.py::' in line and ('PASSED' in line or 'FAILED' in line):
-            # Extract test name - format: test_assignment.py::TestFormHandler::test_name PASSED
-            try:
-                # Split to get the parts
-                if '::' in line:
-                    # Get the test name (after last ::)
-                    parts = line.split('::')
-                    test_info = parts[-1]  # Gets "test_name PASSED" or similar
-                    
-                    # Split to separate name from status
-                    test_parts = test_info.split()
-                    if len(test_parts) >= 2:
-                        test_name = test_parts[0]
-                        # Get the status from the line
-                        status = 'passed' if 'PASSED' in line else 'failed'
-                        
-                        tests.append({
-                            "name": test_name,
-                            "status": status,
-                            "passed": status == 'passed'
-                        })
-            except Exception as e:
-                # Skip malformed lines
-                pass
+        # Match lines like: test_assignment.py::TestFormHandler::test_name PASSED
+        match = re.search(r'test_assignment\.py::TestFormHandler::(\w+)\s+(PASSED|FAILED)', line)
+        if match:
+            test_name = match.group(1)
+            status = 'passed' if match.group(2) == 'PASSED' else 'failed'
+            tests.append({
+                "name": test_name,
+                "status": status,
+                "passed": status == 'passed'
+            })
     
     return tests
 
@@ -72,28 +62,51 @@ def calculate_summary(tests):
     }
 
 def main():
-    # Run tests
-    stdout, stderr, returncode = run_tests()
-    
-    # Parse results
-    tests = parse_pytest_output(stdout, stderr)
-    summary = calculate_summary(tests)
-    
-    # Build final JSON
-    result = {
-        "tests": tests,
-        "summary": summary
-    }
-    
-    # Save to file
-    with open('/app/results.json', 'w') as f:
-        json.dump(result, f, indent=2)
-    
-    # Output JSON to stdout
-    print(json.dumps(result, indent=2), flush=True)
-    
-    # Exit with appropriate code
-    sys.exit(0 if summary["failed"] == 0 else 1)
+    try:
+        # Run tests
+        output, returncode = run_tests()
+        
+        # Parse results
+        tests = parse_pytest_output(output)
+        summary = calculate_summary(tests)
+        
+        # Build final JSON
+        result = {
+            "tests": tests,
+            "summary": summary
+        }
+        
+        # Save to results.json
+        results_file = '/app/results.json'
+        with open(results_file, 'w') as f:
+            json.dump(result, f, indent=2)
+        
+        # Make sure file is synced
+        os.fsync(f.fileno()) if not f.closed else None
+        
+        # Output JSON to stdout with newline
+        json_output = json.dumps(result, indent=2)
+        print(json_output, flush=True)
+        sys.stdout.flush()
+        
+        # Exit with success (0) regardless - we captured the results
+        sys.exit(0)
+    except Exception as e:
+        # Output error as JSON
+        error_result = {
+            "tests": [],
+            "summary": {
+                "total": 0,
+                "passed": 0,
+                "failed": 0,
+                "percentage": 0,
+                "marks": 0
+            },
+            "error": str(e)
+        }
+        print(json.dumps(error_result, indent=2), flush=True)
+        sys.stdout.flush()
+        sys.exit(0)
 
 if __name__ == "__main__":
     main()
