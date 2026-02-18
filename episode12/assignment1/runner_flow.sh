@@ -1,20 +1,62 @@
 #!/bin/bash
 
 # Episode 12 - Assignment 1: Form Data Processing & HTTP Request Handling
-# Runner flow - executed inside Docker container at /app/runner.sh
-# Outputs results in JSON format with test cases and summary
-
-set -e
+# Simple bash runner that outputs JSON results
 
 cd /app
 
-# Set Python to unbuffered mode
-export PYTHONUNBUFFERED=1
+# Run pytest and capture output
+pytest test_assignment.py -v --tb=line > /tmp/pytest_output.txt 2>&1
 
-# Run the Python test results generator
-# Save output to both a log file and stdout
-python3 -u /app/generate_results.py 2>&1 | tee /app/runner.log
+# Parse pytest output and generate JSON
+python3 << 'EOF'
+import json
+import re
 
-# Exit successfully even if tests fail (we captured the results)
+# Read pytest output
+with open('/tmp/pytest_output.txt', 'r') as f:
+    output = f.read()
+
+# Parse test results
+tests = []
+for line in output.split('\n'):
+    match = re.search(r'test_assignment\.py::TestFormHandler::(\w+)\s+(PASSED|FAILED)', line)
+    if match:
+        test_name = match.group(1)
+        status = 'passed' if match.group(2) == 'PASSED' else 'failed'
+        tests.append({
+            "name": test_name,
+            "status": status,
+            "passed": status == 'passed'
+        })
+
+# Calculate summary
+total = len(tests)
+passed = sum(1 for t in tests if t["passed"])
+failed = total - passed
+percentage = (passed / total * 100) if total > 0 else 0
+marks = passed / total if total > 0 else 0
+
+# Build JSON result
+result = {
+    "tests": tests,
+    "summary": {
+        "total": total,
+        "passed": passed,
+        "failed": failed,
+        "percentage": round(percentage, 1),
+        "marks": round(marks, 2)
+    }
+}
+
+# Output JSON
+print(json.dumps(result, indent=2))
+
+# Save to file too
+with open('/app/results.json', 'w') as f:
+    json.dump(result, f, indent=2)
+EOF
+
+# Exit successfully
 exit 0
 
