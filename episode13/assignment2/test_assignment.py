@@ -126,15 +126,17 @@ class TestServerHandler(unittest.TestCase):
     
     @classmethod
     def setUpClass(cls):
-        """Start server"""
-        # Use 127.0.0.1 explicitly to avoid DNS lookup delays
-        cls.server = ReuseAddrHTTPServer(('127.0.0.1', 8008), ServerHandler)
+        """Start server on any available port"""
+        # Use port 0 to let OS assign a free port
+        cls.server = ReuseAddrHTTPServer(('127.0.0.1', 0), ServerHandler)
+        # Get the actual port that was assigned
+        cls.port = cls.server.server_address[1]
         cls.server_thread = threading.Thread(target=cls.server.serve_forever)
         cls.server_thread.daemon = True
         cls.server_thread.start()
         time.sleep(0.3)
         
-        cls.base_url = 'http://127.0.0.1:8008'
+        cls.base_url = f'http://127.0.0.1:{cls.port}'
         cls.session = requests.Session()
     
     @classmethod
