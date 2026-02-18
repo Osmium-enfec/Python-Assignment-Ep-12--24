@@ -10,12 +10,8 @@ cd /app
 export PYTHONUNBUFFERED=1
 export PYTHONDONTWRITEBYTECODE=1
 
-# Run pytest WITHOUT timeout - let portal control execution
-pytest test_assignment.py -v --tb=no -p no:cacheprovider 2>&1 > /tmp/pytest_output.txt &
-PYTEST_PID=$!
-
-# Wait for pytest but be ready to output partial results
-wait $PYTEST_PID 2>/dev/null
+# Run pytest with aggressive timeout (90 seconds) to prevent hanging
+timeout 90 pytest test_assignment.py -v --tb=no -p no:cacheprovider 2>&1 > /tmp/pytest_output.txt
 PYTEST_EXIT=$?
 
 # Parse output and generate JSON using Python
@@ -29,8 +25,11 @@ try:
     # Read pytest output
     output = ""
     if os.path.exists('/tmp/pytest_output.txt'):
-        with open('/tmp/pytest_output.txt', 'r') as f:
-            output = f.read()
+        try:
+            with open('/tmp/pytest_output.txt', 'r') as f:
+                output = f.read()
+        except:
+            output = ""
     
     # Parse ALL test results (including partial output)
     tests = []
