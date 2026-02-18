@@ -17,9 +17,14 @@ import stores
 import page
 
 
-# Custom server class that allows address reuse
+# Custom server class that allows address reuse with SO_REUSEADDR
 class ReuseAddrHTTPServer(ThreadingHTTPServer):
     allow_reuse_address = True
+    
+    def server_bind(self):
+        """Override to set SO_REUSEADDR before binding"""
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        super().server_bind()
 
 
 class TestPageTemplates(unittest.TestCase):

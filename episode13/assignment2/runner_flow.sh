@@ -4,6 +4,10 @@ cd /app
 export PYTHONUNBUFFERED=1
 export PYTHONDONTWRITEBYTECODE=1
 
+# Kill any lingering processes on port 8008
+lsof -ti:8008 | xargs kill -9 2>/dev/null || true
+sleep 1
+
 # RUN pytest with timeout to prevent server hanging tests from stalling
 timeout 60 pytest test_assignment.py -v --tb=short -p no:cacheprovider 2>&1 | tee /tmp/pytest_output.txt
 PYTEST_EXIT=$?
