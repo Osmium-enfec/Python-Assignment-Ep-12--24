@@ -1,0 +1,45 @@
+{% extends "books/base.html" %}
+
+{% block page_title %}Books{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4"><i class="fas fa-book"></i> Books</h1>
+    </div>
+</div>
+
+{% if books %}
+<div class="row">
+    {% for book in books %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">{{ book.title }}</h5>
+                <p class="card-text"><small class="text-muted">{{ book.author }}</small></p>
+                <p class="card-text">
+                    <strong>${{ book.price }}</strong>
+                    <span class="badge bg-info ms-2">{{ book.genre }}</span>
+                </p>
+                {% if book.description %}
+                <p class="card-text"><small>{{ book.description|truncatewords:10 }}</small></p>
+                {% endif %}
+            </div>
+            <div class="card-footer bg-light">
+                <a href="{% url 'books:update' book.id %}" class="btn btn-sm btn-warning">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <a href="{% url 'books:delete' book.id %}" class="btn btn-sm btn-danger">
+                    <i class="fas fa-trash"></i> Delete
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-warning">
+    <i class="fas fa-exclamation-triangle"></i> No books available.
+</div>
+{% endif %}
+{% endblock %}

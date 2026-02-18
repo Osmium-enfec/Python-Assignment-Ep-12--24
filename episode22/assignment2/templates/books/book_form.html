@@ -1,0 +1,59 @@
+{% extends "books/base.html" %}
+
+{% block page_title %}{% if book %}Edit{% else %}Add{% endif %} Book{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header {% if book %}bg-warning{% else %}bg-primary{% endif %} text-{% if book %}dark{% else %}white{% endif %}">
+                <h4 class="mb-0">
+                    <i class="fas fa-{% if book %}edit{% else %}plus{% endif %}"></i>
+                    {% if book %}Edit: {{ book.title }}{% else %}Add New Book{% endif %}
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    {% for field in form %}
+                    <div class="mb-3">
+                        {{ field.label_tag }}
+                        {{ field }}
+
+                        {% if field.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in field.errors %}
+                            <i class="fas fa-exclamation-circle"></i> {{ error }}<br>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        {% if field.help_text %}
+                        <small class="form-text text-muted">{{ field.help_text|safe }}</small>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <i class="fas fa-exclamation-triangle"></i> {{ error }}<br>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-{% if book %}warning{% else %}primary{% endif %}">
+                            <i class="fas fa-save"></i> {% if book %}Update{% else %}Create{% endif %} Book
+                        </button>
+                        <a href="{% url 'books:list' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

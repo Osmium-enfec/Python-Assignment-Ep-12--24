@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block page_title %}Product Categories{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4"><i class="fas fa-tags"></i> Product Categories</h1>
+    </div>
+</div>
+
+{% for category in categories %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h3>{{ category }}</h3>
+        <div class="row">
+            {% for product in products %}
+                {% with cat=product.category %}
+                    {% if cat == category %}
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ product.name }}</h5>
+                                <p class="card-text"><small class="text-muted">{{ product.code }}</small></p>
+                                <p class="card-text">Price: <strong>${{ product.price }}</strong></p>
+                            </div>
+                            <div class="card-footer bg-transparent">
+                                <a href="{% url 'products:detail' product.id %}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endwith %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
