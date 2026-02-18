@@ -1,0 +1,43 @@
+{% extends "students/base.html" %}
+
+{% load static %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-filter"></i> Students (GPA >= {{ min_gpa }})</h2>
+    </div>
+</div>
+
+{% if students %}
+<div class="row">
+    {% for student in students %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">{{ student.name }}</h5>
+                <p class="card-text">
+                    <strong>Roll No:</strong> {{ student.roll_no }}<br>
+                    <strong>GPA:</strong> 
+                    <span class="badge bg-success">{{ student.gpa }}</span>
+                </p>
+            </div>
+            <div class="card-footer bg-white">
+                <a href="{% url 'students:detail' student.id %}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-eye"></i> View
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="fas fa-info-circle"></i> No students with GPA >= {{ min_gpa }}.
+</div>
+{% endif %}
+
+<a href="{% url 'students:list' %}" class="btn btn-secondary mt-3">
+    <i class="fas fa-arrow-left"></i> Back to All
+</a>
+{% endblock %}

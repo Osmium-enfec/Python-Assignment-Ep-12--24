@@ -1,0 +1,53 @@
+{% extends "students/base.html" %}
+
+{% load static %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-users"></i> Student List
+        </h1>
+    </div>
+</div>
+
+{% if students %}
+<div class="row">
+    {% for student in students %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-user-circle"></i> {{ student.name }}
+                </h5>
+                <p class="card-text">
+                    <strong>Roll No:</strong> {{ student.roll_no }}<br>
+                    <strong>Email:</strong> {{ student.email }}<br>
+                    <strong>GPA:</strong> 
+                    <span class="badge {% if student.gpa >= 3.5 %}bg-success{% else %}bg-warning{% endif %}">
+                        {{ student.gpa }}
+                    </span>
+                </p>
+            </div>
+            <div class="card-footer bg-white">
+                <!-- Topic 15: Template Tag {% url %} for URL reversal -->
+                <a href="{% url 'students:detail' student.id %}" class="btn btn-sm btn-info">
+                    <i class="fas fa-eye"></i> View
+                </a>
+                <a href="{% url 'students:edit' student.id %}" class="btn btn-sm btn-warning">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <a href="{% url 'students:delete' student.id %}" class="btn btn-sm btn-danger">
+                    <i class="fas fa-trash"></i> Delete
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="fas fa-info-circle"></i> No students found.
+</div>
+{% endif %}
+{% endblock %}

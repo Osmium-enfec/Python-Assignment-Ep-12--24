@@ -1,0 +1,504 @@
+{% extends "courses/base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="mb-3">
+            <i class="fas fa-book"></i> Courses
+        </h1>
+        
+        <!-- Topic 76: Action Row - Search and stats -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="searchInput" placeholder="Search courses...">
+                    <button class="btn btn-primary" id="searchBtn" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-6 text-end">
+                <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#statsModal">
+                    <i class="fas fa-chart-bar"></i> Statistics
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Topic 41-58: Course Cards with Modal Triggers -->
+<div class="row" id="coursesContainer">
+    {% for course in courses %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100 shadow-sm course-card" data-course-id="{{ course.id }}">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-book-open"></i> {{ course.code }}
+                </h5>
+                <p class="card-text">
+                    <strong>{{ course.title }}</strong><br>
+                    <small class="text-muted">{{ course.instructor }}</small><br>
+                    <span class="badge {% if course.is_full %}bg-danger{% else %}bg-success{% endif %}">
+                        {{ course.enrolled_count }}/{{ course.max_students }}
+                    </span>
+                </p>
+            </div>
+            <div class="card-footer bg-white">
+                <!-- Topic 69: View Button - Opens modal with course details -->
+                <button class="btn btn-sm btn-info view-btn" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#courseModal"
+                        data-course-id="{{ course.id }}">
+                    <i class="fas fa-eye"></i> View
+                </button>
+                
+                <!-- Topic 70: Edit Button - Opens edit modal -->
+                <button class="btn btn-sm btn-warning edit-btn"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editModal"
+                        data-course-id="{{ course.id }}">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                
+                <!-- Topic 71: Delete Button - Confirmation modal -->
+                <button class="btn btn-sm btn-danger delete-btn"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteModal"
+                        data-course-id="{{ course.id }}">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Topic 45-58: Bootstrap Modal Component - View Details -->
+<div class="modal fade" id="courseModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Topic 43: Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title">Course Details</h5>
+                <!-- Topic 55: Close Button -->
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <!-- Topic 44: Modal Body - Dynamic content loaded via AJAX -->
+            <div class="modal-body" id="courseModalBody">
+                <!-- Topic 67: Loading State - Spinner shown while loading -->
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <!-- Topic 45: Modal Footer - Action buttons -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Close
+                </button>
+                <button type="button" class="btn btn-primary" id="enrollBtn">
+                    <i class="fas fa-plus"></i> Enroll
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Topic 45-58: Bootstrap Modal Component - Edit Course -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Course</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <!-- Topic 78: Pre-filled Modal Forms -->
+            <div class="modal-body" id="editModalBody">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Topic 45-58: Bootstrap Modal Component - Delete Confirmation -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-danger">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle"></i> Delete Course
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <!-- Topic 75: Confirmation Dialog -->
+            <div class="modal-body" id="deleteModalBody">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <!-- Topic 71: Delete Button -->
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Topic 45-58: Bootstrap Modal Component - Enrollments List -->
+<div class="modal fade modal-lg" id="enrollmentsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Course Enrollments</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="enrollmentsModalBody">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Topic 45-58: Bootstrap Modal Component - Statistics -->
+<div class="modal fade" id="statsModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Course Statistics</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="statsModalBody">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Topic 44: Enrollment Form Modal -->
+<div class="modal fade" id="enrollModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Enroll in Course</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="enrollForm">
+                    <div class="mb-3">
+                        <label for="studentName" class="form-label">Student Name</label>
+                        <input type="text" class="form-control" id="studentName" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmEnrollBtn">Enroll</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Topic 62-63: Fetch API and AJAX Implementation
+let currentCourseId = null;
+
+// Topic 69: View Button - Load and display course details
+document.querySelectorAll('.view-btn').forEach(btn => {
+    btn.addEventListener('click', async function(e) {
+        currentCourseId = this.dataset.courseId;
+        const courseModal = document.getElementById('courseModal');
+        
+        // Topic 67: Loading State - Show spinner
+        document.getElementById('courseModalBody').innerHTML = 
+            '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>';
+        
+        try {
+            // Topic 62: Fetch API - Load course data
+            const response = await fetch(`/courses/api/${currentCourseId}/detail/`);
+            const data = await response.json();
+            
+            // Topic 68: Dynamic Content - Insert into modal
+            document.getElementById('courseModalBody').innerHTML = `
+                <p><strong>Code:</strong> ${data.code}</p>
+                <p><strong>Title:</strong> ${data.title}</p>
+                <p><strong>Description:</strong> ${data.description}</p>
+                <p><strong>Instructor:</strong> ${data.instructor}</p>
+                <p><strong>Credits:</strong> ${data.credits}</p>
+                <p>
+                    <strong>Capacity:</strong> 
+                    <span class="badge ${data.is_full ? 'bg-danger' : 'bg-success'}">
+                        ${data.enrolled_count}/${data.max_students} (${data.available_seats} available)
+                    </span>
+                </p>
+                <button class="btn btn-link" id="viewEnrollmentsBtn">View Enrollments</button>
+            `;
+            
+            // Load enrollments on click
+            document.getElementById('viewEnrollmentsBtn').addEventListener('click', async function() {
+                const enrollModal = new bootstrap.Modal(document.getElementById('enrollmentsModal'));
+                
+                document.getElementById('enrollmentsModalBody').innerHTML = 
+                    '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>';
+                
+                const enrollResponse = await fetch(`/courses/api/${currentCourseId}/enrollments/`);
+                const enrollData = await enrollResponse.json();
+                
+                let enrollmentsHTML = `<h6>${enrollData.course_code}: ${enrollData.course_title}</h6>
+                    <p>Total Enrollments: ${enrollData.total_enrollments}</p>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr><th>Student Name</th><th>Enrolled Date</th></tr>
+                        </thead>
+                        <tbody>`;
+                
+                enrollData.enrollments.forEach(e => {
+                    enrollmentsHTML += `<tr><td>${e.student_name}</td><td>${e.enrolled_date}</td></tr>`;
+                });
+                
+                enrollmentsHTML += '</tbody></table>';
+                document.getElementById('enrollmentsModalBody').innerHTML = enrollmentsHTML;
+            });
+        } catch (error) {
+            // Topic 70: Error Handling
+            document.getElementById('courseModalBody').innerHTML = 
+                '<div class="alert alert-danger">Error loading course details</div>';
+        }
+    });
+});
+
+// Topic 70: Edit Button - Load pre-filled form
+document.querySelectorAll('.edit-btn').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        currentCourseId = this.dataset.courseId;
+        
+        document.getElementById('editModalBody').innerHTML = 
+            '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>';
+        
+        try {
+            const response = await fetch(`/courses/api/${currentCourseId}/edit-form/`);
+            const data = await response.json();
+            document.getElementById('editModalBody').innerHTML = data.form;
+        } catch (error) {
+            document.getElementById('editModalBody').innerHTML = 
+                '<div class="alert alert-danger">Error loading form</div>';
+        }
+    });
+});
+
+// Topic 70: Save edited course
+document.getElementById('saveBtn').addEventListener('click', async function() {
+    const formData = new FormData();
+    formData.append('title', document.getElementById('title').value);
+    formData.append('description', document.getElementById('description').value);
+    formData.append('instructor', document.getElementById('instructor').value);
+    formData.append('credits', document.getElementById('credits').value);
+    
+    try {
+        const response = await fetch(`/courses/api/${currentCourseId}/update/`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: formData
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Course updated successfully');
+            bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+            location.reload();
+        }
+    } catch (error) {
+        alert('Error updating course');
+    }
+});
+
+// Topic 71: Delete Button - Show confirmation
+document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        currentCourseId = this.dataset.courseId;
+        
+        document.getElementById('deleteModalBody').innerHTML = 
+            '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>';
+        
+        try {
+            const response = await fetch(`/courses/api/${currentCourseId}/delete-confirm/`);
+            const data = await response.json();
+            
+            document.getElementById('deleteModalBody').innerHTML = `
+                <h6>${data.course_code}: ${data.course_title}</h6>
+                <p class="text-danger"><strong>${data.message}</strong></p>
+            `;
+        } catch (error) {
+            document.getElementById('deleteModalBody').innerHTML = 
+                '<div class="alert alert-danger">Error loading confirmation</div>';
+        }
+    });
+});
+
+// Topic 71: Confirm delete
+document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+    try {
+        const response = await fetch(`/courses/api/${currentCourseId}/delete/`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            alert(data.message);
+            bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+            location.reload();
+        }
+    } catch (error) {
+        alert('Error deleting course');
+    }
+});
+
+// Topic 72: Button styling - Enrollment button
+document.getElementById('enrollBtn').addEventListener('click', async function() {
+    const enrollModal = new bootstrap.Modal(document.getElementById('enrollModal'));
+    enrollModal.show();
+});
+
+// Topic 72: Confirm enrollment
+document.getElementById('confirmEnrollBtn').addEventListener('click', async function() {
+    const studentName = document.getElementById('studentName').value;
+    const formData = new FormData();
+    formData.append('student_name', studentName);
+    
+    try {
+        const response = await fetch(`/courses/api/${currentCourseId}/enroll/`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: formData
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            alert(data.message);
+            bootstrap.Modal.getInstance(document.getElementById('enrollModal')).hide();
+            bootstrap.Modal.getInstance(document.getElementById('courseModal')).hide();
+            location.reload();
+        } else {
+            alert(data.message);
+        }
+    } catch (error) {
+        alert('Error enrolling student');
+    }
+});
+
+// Topic 61: Statistics modal
+document.getElementById('statsModal').addEventListener('show.bs.modal', async function() {
+    document.getElementById('statsModalBody').innerHTML = 
+        '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>';
+    
+    try {
+        const response = await fetch('/courses/api/stats/');
+        const data = await response.json();
+        
+        document.getElementById('statsModalBody').innerHTML = `
+            <p><strong>Total Courses:</strong> ${data.total_courses}</p>
+            <p><strong>Total Enrollments:</strong> ${data.total_enrollments}</p>
+            <p><strong>Total Capacity:</strong> ${data.total_capacity}</p>
+            <p><strong>Average per Course:</strong> ${data.average_per_course}</p>
+        `;
+    } catch (error) {
+        document.getElementById('statsModalBody').innerHTML = 
+            '<div class="alert alert-danger">Error loading statistics</div>';
+    }
+});
+
+// Topic 65: Search functionality
+document.getElementById('searchBtn').addEventListener('click', async function() {
+    const query = document.getElementById('searchInput').value;
+    const formData = new FormData();
+    formData.append('q', query);
+    
+    try {
+        const response = await fetch('/courses/api/search/', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: formData
+        });
+        const data = await response.json();
+        
+        let html = '';
+        data.courses.forEach(course => {
+            html += `
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">${course.code}</h5>
+                            <p class="card-text">
+                                ${course.title}<br>
+                                <small>${course.available_seats} seats available</small>
+                            </p>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <button class="btn btn-sm btn-info view-btn" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#courseModal"
+                                    data-course-id="${course.id}">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        document.getElementById('coursesContainer').innerHTML = html || '<p>No courses found</p>';
+        
+        // Re-attach event listeners to new buttons
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', async function(e) {
+                // Same logic as above
+            });
+        });
+    } catch (error) {
+        alert('Error searching courses');
+    }
+});
+
+// CSRF Token helper
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}
