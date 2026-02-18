@@ -45,8 +45,8 @@ try:
 except:
     content = ""
 
-# Parse individual test results - matches all test classes
-pattern = r'test_assignment\.py::(Test\w+)::(\w+)\s+(PASSED|FAILED)'
+# Parse individual test results - capture PASSED, FAILED, ERROR
+pattern = r'test_assignment\.py::(Test\w+)::(\w+)\s+(PASSED|FAILED|ERROR)'
 matches = re.findall(pattern, content)
 
 for test_class, test_name, status in matches:
@@ -56,11 +56,25 @@ for test_class, test_name, status in matches:
         passed += 1
     else:
         failed += 1
-    tests.append({
+    
+    test_entry = {
         "name": test_name,
         "status": status.lower(),
         "passed": is_passed
-    })
+    }
+    
+    # Extract error message if ERROR status
+    if status == 'ERROR':
+        error_pattern = f'ERROR at setup of {test_class}::{test_name}.*?(?=ERROR at setup|=====|$)'
+        error_match = re.search(error_pattern, content, re.DOTALL)
+        if error_match:
+            error_text = error_match.group(0)
+            # Extract the actual error line
+            error_line_match = re.search(r'E\s+(.*?)$', error_text, re.MULTILINE)
+            if error_line_match:
+                test_entry["error"] = error_line_match.group(1).strip()
+    
+    tests.append(test_entry)
 
 if total == 0 and content:
     note = "Partial execution - some tests may not have been captured"

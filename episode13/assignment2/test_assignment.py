@@ -20,6 +20,7 @@ import page
 # Custom server class that allows address reuse with SO_REUSEADDR
 class ReuseAddrHTTPServer(ThreadingHTTPServer):
     allow_reuse_address = True
+    daemon_threads = True
     
     def server_bind(self):
         """Override to set SO_REUSEADDR before binding"""
@@ -126,13 +127,14 @@ class TestServerHandler(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Start server"""
-        cls.server = ReuseAddrHTTPServer(('localhost', 8008), ServerHandler)
+        # Use 127.0.0.1 explicitly to avoid DNS lookup delays
+        cls.server = ReuseAddrHTTPServer(('127.0.0.1', 8008), ServerHandler)
         cls.server_thread = threading.Thread(target=cls.server.serve_forever)
         cls.server_thread.daemon = True
         cls.server_thread.start()
-        time.sleep(0.5)
+        time.sleep(0.3)
         
-        cls.base_url = 'http://localhost:8008'
+        cls.base_url = 'http://127.0.0.1:8008'
         cls.session = requests.Session()
     
     @classmethod
