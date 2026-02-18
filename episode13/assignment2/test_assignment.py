@@ -138,7 +138,12 @@ class TestServerHandler(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         """Shutdown server"""
-        cls.server.shutdown()
+        try:
+            cls.server.shutdown()
+            cls.server.server_close()
+        except:
+            pass
+        time.sleep(0.2)
     
     def setUp(self):
         """Clear data"""
