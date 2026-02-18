@@ -1,0 +1,97 @@
+/* Topic 1-40: Auth system styling */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card {
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card-title {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.btn {
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.user-info p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.badge {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+}
+
+.alert {
+    border: none;
+    border-radius: 8px;
+}
+
+/* Topic 7-8: Navbar user links */
+.navbar-nav .nav-link {
+    transition: color 0.2s;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #80bdff !important;
+}
+
+/* Topic 23: Auth protected content */
+.user-info {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Form styling */
+form {
+    margin-top: 1.5rem;
+}
+
+label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #555;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.invalid-feedback {
+    display: block;
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}

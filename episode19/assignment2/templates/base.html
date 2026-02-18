@@ -1,0 +1,58 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gallery{% endblock %}</title>
+    
+    <!-- Topic 11: Bootstrap CSS from CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Topic 12: Custom CSS static file -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    <!-- Topic 18: Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Topic 13: Gallery specific styles -->
+    <link rel="stylesheet" href="{% static 'css/gallery.css' %}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Topic 13: Bootstrap navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'gallery:list' %}">
+                <i class="fas fa-image"></i> Image Gallery
+            </a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'gallery:list' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'gallery:upload' %}">Upload</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Topic 14: Container with responsive layout -->
+    <div class="container-fluid my-5">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- Topic 16: Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Topic 19: Custom JavaScript -->
+    <script src="{% static 'js/gallery.js' %}"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

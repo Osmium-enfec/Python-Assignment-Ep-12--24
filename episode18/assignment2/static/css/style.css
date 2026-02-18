@@ -1,0 +1,76 @@
+/* Topic 41-80: Blog post styling */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.post-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 8px;
+}
+
+.post-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.post-detail {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.post-detail h1 {
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.post-content {
+    line-height: 1.8;
+    font-size: 1.1rem;
+    color: #555;
+    margin: 2rem 0;
+}
+
+.comments-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.comment {
+    border-left: 4px solid #007bff;
+}
+
+.badge {
+    margin-right: 0.5rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.btn {
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+form {
+    margin-top: 1.5rem;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 120px;
+}

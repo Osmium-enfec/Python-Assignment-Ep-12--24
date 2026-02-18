@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ image.title }}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Topic 37-40: Display full image -->
+            <img src="{{ image.image.url }}" class="img-fluid rounded mb-4" alt="{{ image.title }}">
+            
+            <h1>{{ image.title }}</h1>
+            {% if image.caption %}
+                <p class="lead">{{ image.caption }}</p>
+            {% endif %}
+            
+            <div class="mb-4">
+                <a href="{% url 'gallery:detail' image.gallery.id %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Gallery
+                </a>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Topic 61-70: Comments section -->
+            <div class="comments-section">
+                <h3><i class="fas fa-comments"></i> Comments ({{ image.comments.count }})</h3>
+                
+                <!-- Display approved comments -->
+                {% for comment in image.comments.approved %}
+                    <div class="comment-item card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <strong>{{ comment.author }}</strong>
+                                <!-- Topic 70: Display star rating -->
+                                <span class="rating-stars">
+                                    {% for star in comment.get_rating_stars %}★{% endfor %}
+                                </span>
+                            </div>
+                            <small class="text-muted">{{ comment.created_at|date:"M d, Y" }}</small>
+                            <p class="mt-2">{{ comment.text }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+                
+                <!-- TODO: Comment submission form (Topics 61-70) -->
+                <div class="comment-form card">
+                    <div class="card-body">
+                        <h5>Leave a Comment</h5>
+                        <form method="post" action="{% url 'gallery:image_comments' image.id %}">
+                            {% csrf_token %}
+                            <!-- Topic 62-65: Form fields -->
+                            <!-- {{ form.as_p }} -->
+                            <button type="submit" class="btn btn-primary">Post Comment</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

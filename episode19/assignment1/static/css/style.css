@@ -1,0 +1,64 @@
+/* Topic 12-15: Custom CSS for product styling */
+
+/* Topic 15: Override Bootstrap price styling */
+.price-highlight {
+    font-size: 24px;
+    font-weight: bold;
+    color: #28a745;
+}
+
+/* Topic 13: Custom card styling */
+.card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card-img-top {
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Topic 14: Responsive utilities */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Topic 19: Animation for page load */
+.card {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Topic 20: Button hover effects */
+.btn {
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: scale(1.05);
+}
+
+/* Image container styling */
+.img-fluid {
+    max-height: 500px;
+    object-fit: contain;
+}

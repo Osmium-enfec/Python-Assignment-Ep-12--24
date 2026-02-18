@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.name }} - Details{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1>{{ project.name }}</h1>
+        <p class="text-muted">{{ project.description }}</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Project Info</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Status:</strong>
+                    {% if project.is_active %}
+                        <span class="badge bg-success">Active</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Inactive</span>
+                    {% endif %}
+                </p>
+                <p><strong>Created:</strong> {{ project.created_at|date:"M d, Y H:i" }}</p>
+                <p><strong>Updated:</strong> {{ project.updated_at|date:"M d, Y H:i" }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">Statistics</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Total Events:</strong> {{ stats.total_events }}</p>
+                {% for event_type in stats.event_types %}
+                    <p><strong>{{ event_type.event_type|title }}:</strong> {{ event_type.count }}</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <h3>Recent Events</h3>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Type</th>
+                        <th>User ID</th>
+                        <th>URL</th>
+                        <th>Duration (ms)</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                        <tr>
+                            <td><span class="badge bg-secondary">{{ event.get_event_type_display }}</span></td>
+                            <td>{{ event.user_id|default:"-" }}</td>
+                            <td>{{ event.url|truncatechars:30|default:"-" }}</td>
+                            <td>{{ event.duration_ms }}</td>
+                            <td>{{ event.timestamp|date:"M d, H:i:s" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">No events yet</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <a href="{% url 'analytics:project_update' project.id %}" class="btn btn-warning">
+            <i class="fas fa-edit"></i> Edit Project
+        </a>
+        <a href="{% url 'analytics:event_create' %}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Log Event
+        </a>
+        <a href="{% url 'analytics:project_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+{% endblock %}

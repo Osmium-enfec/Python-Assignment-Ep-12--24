@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="card-title">
+                        <i class="fas fa-user-cog"></i> Edit Profile
+                    </h1>
+                    
+                    <!-- Topic 11-20: Profile editing form -->
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- TODO: Render profile form fields -->
+                        <!-- Topic 13: bio field (Textarea) -->
+                        <!-- Topic 14: phone field -->
+                        <!-- Topic 15: avatar field (FileInput) -->
+                        <!-- Topic 16: date_of_birth field (DateInput) -->
+                        <!-- {{ form.as_p }} -->
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+                        
+                        <button type="submit" class="btn btn-primary mt-3">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                        <a href="{% url 'accounts:dashboard' %}" class="btn btn-secondary mt-3">
+                            Cancel
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

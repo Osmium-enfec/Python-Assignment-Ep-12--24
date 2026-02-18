@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} Book{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <!-- TODO: Book Form Template (Topics 57-80):
+             1. Extends base.html
+             2. Heading: "Add Book" or "Edit Book"
+             3. Form with:
+                - method="POST"
+                - {% csrf_token %} (Topic 49)
+                - For each form field:
+                  * {{ form.field.label }}
+                  * {{ form.field }} with Bootstrap classes (Topics 57-64)
+                  * {{ form.field.errors }} (Topic 71)
+                - Submit button: "Save Book" (btn-success)
+                - Cancel button back to list (btn-secondary)
+                - Topic 79: Icons in buttons
+             4. Form groups with mb-3 spacing
+             5. Error highlighting
+             6. Required field indicators
+        -->
+    </div>
+</div>
+{% endblock %}

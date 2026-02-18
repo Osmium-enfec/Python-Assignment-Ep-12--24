@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-8">
+            <article class="post-detail">
+                <h1>{{ post.title }}</h1>
+                
+                <!-- Topic 41-50: Author info -->
+                <p class="text-muted">
+                    <small>
+                        By <strong>{{ post.author.get_full_name|default:post.author.username }}</strong>
+                        on {{ post.created_at|date:"F j, Y" }}
+                    </small>
+                </p>
+                
+                <!-- Topic 51-60, 71-75: Status and visibility -->
+                <div class="mb-3">
+                    {% if post.status == 'published' %}
+                        <span class="badge bg-success">Published</span>
+                    {% endif %}
+                    {% if post.visibility == 'private' %}
+                        <span class="badge bg-danger"><i class="fas fa-lock"></i> Private</span>
+                    {% elif post.visibility == 'friends' %}
+                        <span class="badge bg-info"><i class="fas fa-users"></i> Friends Only</span>
+                    {% else %}
+                        <span class="badge bg-primary"><i class="fas fa-globe"></i> Public</span>
+                    {% endif %}
+                </div>
+                
+                <div class="post-content">
+                    {{ post.content }}
+                </div>
+                
+                <!-- Topic 76-80: Edit/delete buttons for author -->
+                {% if user == post.author %}
+                    <div class="mt-4">
+                        <a href="{% url 'posts:edit' post.id %}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Edit Post
+                        </a>
+                        <a href="{% url 'posts:delete' post.id %}" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Delete Post
+                        </a>
+                    </div>
+                {% endif %}
+            </article>
+            
+            <!-- Topic 61-70: Comments section -->
+            <section class="comments-section mt-5">
+                <h3>Comments ({{ approved_comments.count }})</h3>
+                
+                {% for comment in approved_comments %}
+                    <div class="comment card mb-3">
+                        <div class="card-body">
+                            <strong>{{ comment.author.username }}</strong>
+                            <small class="text-muted">{{ comment.created_at|date:"M d, Y" }}</small>
+                            <p class="mt-2">{{ comment.content }}</p>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p>No comments yet.</p>
+                {% endfor %}
+                
+                <!-- Topic 61-70: Comment form for authenticated users -->
+                {% if user.is_authenticated %}
+                    <div class="card mt-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Leave a Comment</h5>
+                            <form method="post" action="{% url 'posts:comment' post.id %}">
+                                {% csrf_token %}
+                                <!-- TODO: Comment form fields -->
+                                <button type="submit" class="btn btn-primary">Post Comment</button>
+                            </form>
+                        </div>
+                    </div>
+                {% else %}
+                    <p><a href="{% url 'posts:login' %}">Login</a> to comment.</p>
+                {% endif %}
+            </section>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">About Author</h5>
+                    <p>
+                        <strong>{{ post.author.get_full_name|default:post.author.username }}</strong>
+                    </p>
+                    <p class="text-muted">
+                        Member since {{ post.author.date_joined|date:"F Y" }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

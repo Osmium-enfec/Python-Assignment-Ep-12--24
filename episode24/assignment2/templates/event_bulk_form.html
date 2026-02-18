@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Bulk Create Events{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h1 class="mb-4">Bulk Create Events</h1>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label for="project_select" class="form-label">Select Project *</label>
+                <select name="project_id" id="project_select" class="form-select" required>
+                    <option value="">-- Choose a project --</option>
+                    {% for project in projects %}
+                        <option value="{{ project.id }}">{{ project.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> This will create 3 sample events:
+                <ul class="mb-0 mt-2">
+                    <li>1 Page View (100ms)</li>
+                    <li>1 Click (50ms)</li>
+                    <li>1 Form Submit (200ms)</li>
+                </ul>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-plus-circle"></i> Bulk Create
+                </button>
+                <a href="{% url 'analytics:dashboard' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Galleries{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">
+        <i class="fas fa-images"></i> Image Galleries
+    </h1>
+
+    <!-- Topic 11-14: Bootstrap grid for galleries -->
+    <div class="row">
+        {% for gallery in galleries %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <!-- Topic 11: Bootstrap card -->
+                <div class="card gallery-card">
+                    <!-- Topic 37: Display first image as thumbnail -->
+                    {% if gallery.images.first.image %}
+                        <div class="gallery-image-wrapper">
+                            <img src="{{ gallery.images.first.image.url }}" 
+                                 class="card-img-top" 
+                                 alt="{{ gallery.title }}">
+                        </div>
+                    {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                             style="height: 200px;">
+                            <i class="fas fa-image fa-5x text-muted"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="card-body">
+                        <h5 class="card-title">{{ gallery.title }}</h5>
+                        <p class="card-text text-truncate">{{ gallery.description }}</p>
+                        
+                        <!-- Topic 43: Show image count -->
+                        <small class="text-muted">
+                            <i class="fas fa-images"></i> {{ gallery.image_count }} images
+                        </small>
+                        
+                        <div class="mt-3">
+                            <a href="{% url 'gallery:detail' gallery.id %}" 
+                               class="btn btn-primary btn-sm">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="alert alert-info">No galleries available.</div>
+        {% endfor %}
+    </div>
+{% endblock %}

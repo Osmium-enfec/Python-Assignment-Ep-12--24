@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit {{ student.name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <!-- TODO: Add header with title and back link -->
+        
+        <!-- TODO: Edit Form with Field Groups (Topics 66-68):
+             - Form method POST with CSRF token
+             - 3 Field Groups:
+               1. Personal Information: name, email
+               2. Academic Info: major, status, gpa
+               3. Additional: age
+             - Each group with card styling (mb-3)
+             - For each field:
+               * Label with icon
+               * Input with Bootstrap class
+               * Error display if invalid
+             - Buttons:
+               * "Save Changes" (btn-success)
+               * "Cancel" (btn-secondary)
+               * Show what's being changed
+        -->
+    </div>
+</div>
+{% endblock %}

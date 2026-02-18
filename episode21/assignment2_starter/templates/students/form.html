@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} Course{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <h1 class="mb-4">{% if form.instance.pk %}Edit{% else %}Add{% endif %} Course</h1>
+        
+        <!-- TODO: Create course form template (Topics 41-80):
+             1. Form method POST (Topic 32)
+             2. {% csrf_token %} (Topic 41)
+             3. For each form field:
+                - {{ field.label_tag }}
+                - {{ field }} with Bootstrap classes (Topic 61)
+                - {{ field.errors }} for error display (Topic 58)
+             4. Display form errors with alert class (Topics 59, 64)
+             5. Submit button: "Save Course" (Topic 78)
+             6. Bootstrap form-group spacing (mb-3)
+             7. Form-control class for inputs (Topic 61)
+             8. Error styling with is-invalid (Topic 62, 64)
+             9. Help text display (Topic 22)
+        -->
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="card-title">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </h1>
+                    
+                    <!-- Topic 1-5, 21-25: Login form -->
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- TODO: Render form fields -->
+                        <!-- Topic 1: username/email field -->
+                        <!-- Topic 4: password field with PasswordInput widget -->
+                        <!-- {{ form.as_p }} -->
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                <strong>Invalid login!</strong>
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+                        
+                        <button type="submit" class="btn btn-primary w-100 mt-3">
+                            <i class="fas fa-lock-open"></i> Login
+                        </button>
+                    </form>
+                    
+                    <hr>
+                    
+                    <p class="text-center">
+                        Don't have an account? 
+                        <a href="{% url 'accounts:register' %}">Register here</a>
+                    </p>
+                    
+                    <p class="text-center">
+                        <a href="{% url 'accounts:password_reset' %}">Forgot password?</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

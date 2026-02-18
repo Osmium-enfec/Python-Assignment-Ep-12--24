@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ gallery.title }}{% endblock %}
+
+{% block content %}
+    <div class="mb-4">
+        <a href="{% url 'gallery:list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+
+    <h1>{{ gallery.title }}</h1>
+    <p class="lead">{{ gallery.description }}</p>
+
+    <!-- Topic 37-40: Display images in masonry grid -->
+    <div class="row">
+        {% for image in gallery.images.all %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card image-card">
+                    <!-- Topic 37: Display image -->
+                    <img src="{{ image.image.url }}" class="card-img-top" alt="{{ image.title }}">
+                    
+                    <div class="card-body">
+                        <h5 class="card-title">{{ image.title }}</h5>
+                        {% if image.caption %}
+                            <p class="card-text">{{ image.caption }}</p>
+                        {% endif %}
+                        
+                        <!-- Topic 61-70: Show comment count -->
+                        <small class="text-muted">
+                            <i class="fas fa-comments"></i> {{ image.comments.count }} comments
+                        </small>
+                        
+                        <div class="mt-3">
+                            <a href="{% url 'gallery:image_view' image.id %}" 
+                               class="btn btn-primary btn-sm">
+                                <i class="fas fa-comment-dots"></i> View & Comment
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="alert alert-warning">No images in this gallery.</div>
+        {% endfor %}
+    </div>
+{% endblock %}

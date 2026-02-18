@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete {{ book.title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <!-- TODO: Book Delete Confirmation Template (Topics 68-70):
+             1. Extends base.html
+             2. Heading: "Delete Book?"
+             3. Warning box with:
+                - Book information: title, author, ISBN
+                - Warning message about permanent deletion (Topic 68)
+                - Bootstrap alert class
+             4. Confirmation form:
+                - method="POST"
+                - {% csrf_token %}}
+                - "Confirm Delete" button (btn-danger) (Topic 78)
+                - "Cancel" button back to list (btn-secondary)
+                - Icons in buttons (Topic 79)
+             5. Visual emphasis on warning
+        -->
+    </div>
+</div>
+{% endblock %}
