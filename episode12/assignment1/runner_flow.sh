@@ -3,14 +3,36 @@
 # Episode 12 - Assignment 1: Form Data Processing & HTTP Request Handling
 # Simple bash runner that outputs JSON results
 
+set +e  # Don't exit on errors
 cd /app
 
-# Run pytest and save output to file
-pytest test_assignment.py -v --tb=short 2>&1 > /tmp/pytest_output.txt
+# Ensure we have enough resources
+export PYTHONUNBUFFERED=1
+export PYTHONDONTWRITEBYTECODE=1
+
+# Run pytest with minimal output overhead
+timeout 120 pytest test_assignment.py -v --tb=short 2>&1 > /tmp/pytest_output.txt
 PYTEST_EXIT=$?
 
-# Save exit code
-echo $PYTEST_EXIT > /tmp/pytest_exit.txt
+# If pytest times out or fails hard, still try to output something
+if [ $PYTEST_EXIT -eq 137 ] || [ $PYTEST_EXIT -eq 124 ]; then
+    # Killed or timeout - output error JSON
+    cat > /tmp/results_error.json << 'EOF'
+{
+  "tests": [],
+  "summary": {
+    "total": 0,
+    "passed": 0,
+    "failed": 0,
+    "percentage": 0,
+    "marks": 0
+  },
+  "error": "Test execution timeout or killed (exit 137/124)"
+}
+EOF
+    cat /tmp/results_error.json
+    exit 0
+fi
 
 # Parse output and generate JSON using Python
 python3 << 'PYTHON_EOF'
@@ -21,16 +43,11 @@ import os
 
 try:
     # Read pytest output from file
-    with open('/tmp/pytest_output.txt', 'r') as f:
-        output = f.read()
-    
-    # Get pytest exit code
-    pytest_exit = 0
-    try:
-        with open('/tmp/pytest_exit.txt', 'r') as f:
-            pytest_exit = int(f.read().strip())
-    except:
-        pytest_exit = -1
+    if not os.path.exists('/tmp/pytest_output.txt'):
+        output = ""
+    else:
+        with open('/tmp/pytest_output.txt', 'r') as f:
+            output = f.read()
     
     # Parse test results using regex
     tests = []
@@ -66,7 +83,6 @@ try:
     }
 
 except Exception as e:
-    import traceback
     result = {
         'tests': [],
         'summary': {
@@ -79,7 +95,7 @@ except Exception as e:
         'error': str(e)
     }
 
-# Output JSON to stdout
+# Output JSON
 sys.stdout.write(json.dumps(result, indent=2))
 sys.stdout.write('\n')
 sys.stdout.flush()
