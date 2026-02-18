@@ -3,14 +3,14 @@
 # Episode 12 - Assignment 1: Form Data Processing & HTTP Request Handling
 # Simple bash runner that outputs JSON results
 
-set -e
 cd /app
 
-# Run pytest and capture output
-pytest test_assignment.py -v --tb=line 2>&1 | tee /tmp/pytest_output.txt
+# Run pytest and save output to file (no tee)
+pytest test_assignment.py -v --tb=short > /tmp/pytest_output.txt 2>&1
+PYTEST_EXIT=$?
 
-# Generate JSON using Python and output immediately
-python3 -c "
+# Parse output and generate JSON using Python
+python3 << 'PYTHON_EOF'
 import json
 import re
 import sys
@@ -20,19 +20,19 @@ try:
     with open('/tmp/pytest_output.txt', 'r') as f:
         output = f.read()
     
-    # Parse test results using regex
+    # Parse test results using regex - look for the test line pattern
     tests = []
     for line in output.split('\n'):
-        if 'test_assignment.py::TestFormHandler::' in line and ('PASSED' in line or 'FAILED' in line):
-            match = re.search(r'::(\w+)\s+(PASSED|FAILED)', line)
-            if match:
-                test_name = match.group(1)
-                status = 'passed' if match.group(2) == 'PASSED' else 'failed'
-                tests.append({
-                    'name': test_name,
-                    'status': status,
-                    'passed': status == 'passed'
-                })
+        # Match: test_assignment.py::TestFormHandler::test_name PASSED or FAILED
+        match = re.search(r'test_assignment\.py::TestFormHandler::(\w+)\s+(PASSED|FAILED)', line)
+        if match:
+            test_name = match.group(1)
+            status = 'passed' if match.group(2) == 'PASSED' else 'failed'
+            tests.append({
+                'name': test_name,
+                'status': status,
+                'passed': status == 'passed'
+            })
     
     # Calculate summary
     total = len(tests)
@@ -53,14 +53,6 @@ try:
         }
     }
     
-    # Output JSON to stdout
-    print(json.dumps(result, indent=2), file=sys.stdout, flush=True)
-    sys.stdout.flush()
-    
-    # Save to file as backup
-    with open('/app/results.json', 'w') as f:
-        json.dump(result, f, indent=2)
-        
 except Exception as e:
     import traceback
     result = {
@@ -72,12 +64,18 @@ except Exception as e:
             'percentage': 0,
             'marks': 0
         },
-        'error': str(e),
-        'traceback': traceback.format_exc()
+        'error': str(e)
     }
-    print(json.dumps(result, indent=2), file=sys.stdout, flush=True)
-    sys.stdout.flush()
-" 2>&1
+
+# Output JSON to stdout
+print(json.dumps(result, indent=2))
+sys.stdout.flush()
+
+# Save to file
+with open('/app/results.json', 'w') as f:
+    json.dump(result, f, indent=2)
+
+PYTHON_EOF
 
 exit 0
 
