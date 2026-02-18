@@ -4,23 +4,6 @@ cd /app
 export PYTHONUNBUFFERED=1
 export PYTHONDONTWRITEBYTECODE=1
 
-# Clean up port 8008 before running tests using Python
-python3 << 'CLEANUP_EOF'
-import socket
-import time
-
-for port in [8008]:
-    try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        sock.bind(('localhost', port))
-        sock.close()
-        print(f"Port {port} is free")
-    except OSError:
-        print(f"Port {port} still in use, waiting...")
-        time.sleep(2)
-CLEANUP_EOF
-
 # RUN pytest with timeout to prevent server hanging tests from stalling
 timeout 60 pytest test_assignment.py -v --tb=short -p no:cacheprovider 2>&1 | tee /tmp/pytest_output.txt
 PYTEST_EXIT=$?
