@@ -4,16 +4,14 @@ cd /app
 export PYTHONUNBUFFERED=1
 export PYTHONDONTWRITEBYTECODE=1
 
-# RUN pytest with timeout to prevent server hanging tests from stalling
-timeout 60 pytest test_assignment.py -v --tb=short -p no:cacheprovider 2>&1 | tee /tmp/pytest_output.txt
-PYTEST_EXIT=$?
+# RUN pytest silently, capture to file
+timeout 60 pytest test_assignment.py -v --tb=short -p no:cacheprovider > /tmp/pytest_output.txt 2>&1
 
-# Python subprocess parses output and generates JSON
+# Parse and output ONLY JSON to stdout
 python3 << 'PYTHON_EOF'
 import json
 import re
 import sys
-import os
 
 output_file = '/tmp/pytest_output.txt'
 tests = []
@@ -82,13 +80,9 @@ result = {
 if note:
     result["note"] = note
 
-# Output JSON to stdout
-sys.stdout.write(json.dumps(result, indent=2) + '\n')
+# Output ONLY JSON to stdout (this is what portal captures)
+print(json.dumps(result, indent=2))
 sys.stdout.flush()
-
-# Also save to file
-with open('/app/results.json', 'w') as f:
-    json.dump(result, f, indent=2)
 
 PYTHON_EOF
 
