@@ -10,8 +10,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '2'
-          memory: 1G
+          cpus: '1'
+          memory: 512M
     tmpfs:
       - /tmp:size=200M,noexec,nosuid
     networks:
