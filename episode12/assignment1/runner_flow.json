@@ -1,0 +1,17 @@
+{
+  "version": "1.0",
+  "steps": [
+    {
+      "name": "Setup",
+      "command": "cd /workspace && docker load -i x86.tar"
+    },
+    {
+      "name": "Build",
+      "command": "docker build -t ep12-assignment1:latest /workspace"
+    },
+    {
+      "name": "Test",
+      "command": "docker run --rm ep12-assignment1:latest pytest test_assignment.py -v --tb=short"
+    }
+  ]
+}
