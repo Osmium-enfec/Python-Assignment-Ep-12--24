@@ -46,7 +46,8 @@ except:
     content = ""
 
 # Parse individual test results - capture PASSED, FAILED, ERROR
-pattern = r'test_assignment\.py::(Test\w+)::(\w+)\s+(PASSED|FAILED|ERROR)'
+# Match format: test_assignment.py::ClassName::test_name STATUS
+pattern = r'test_assignment\.py::(\w+)::(\w+)\s+(PASSED|FAILED|ERROR)'
 matches = re.findall(pattern, content)
 
 for test_class, test_name, status in matches:
