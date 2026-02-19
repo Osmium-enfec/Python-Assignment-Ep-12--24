@@ -3,19 +3,27 @@ version: '3.8'
 services:
   judge:
     image: ep13-assignment2-x86:latest
+    
     security_opt:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    
     deploy:
       resources:
         limits:
           cpus: '1'
           memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    
     tmpfs:
-      - /tmp:size=200M,noexec,nosuid
+      - /tmp:rw,noexec,nosuid,size=200M
+    
     networks:
       - judge-network
+    
     command: /bin/sh -c "/app/runner_flow.sh"
 
 networks:
