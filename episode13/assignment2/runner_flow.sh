@@ -1,62 +1,91 @@
 #!/bin/bash
 
+# Episode 13 - Assignment 2: Routing, Templates & PRG Pattern
+# Following Assignment 1 proven approach
+
 set +e
 cd /app
 
 export PYTHONUNBUFFERED=1
 export PYTHONDONTWRITEBYTECODE=1
 
-# Create default results immediately
-cat > /tmp/results.json << 'EOF'
-{"tests": [], "summary": {"total": 0, "passed": 0, "failed": 0, "percentage": 0, "marks": 0}}
-EOF
+# Run pytest in background - let portal control timeout
+pytest test_assignment.py -v --tb=no -p no:cacheprovider 2>&1 > /tmp/pytest_output.txt &
+PYTEST_PID=$!
 
-# Run tests with aggressive timeout
-timeout 8 /usr/local/bin/python3 -m pytest test_assignment.py -v --tb=no -p no:cacheprovider > /tmp/pytest.txt 2>&1 || true
+# Wait for pytest
+wait $PYTEST_PID 2>/dev/null
+PYTEST_EXIT=$?
 
-# Parse and output results
-python3 << 'PYEOF'
+# Parse and output JSON
+python3 << 'PYTHON_EOF'
 import json
+import re
+import sys
+import os
 
-tests = []
 try:
-    with open('/tmp/pytest.txt', 'r') as f:
-        for line in f:
-            if ' PASSED ' in line and '::' in line:
-                parts = line.split('::')
-                if len(parts) >= 3:
-                    name = parts[2].split(' ')[0]
-                    if name:
-                        tests.append({'name': name, 'status': 'passed', 'passed': True})
-            elif ' FAILED ' in line and '::' in line:
-                parts = line.split('::')
-                if len(parts) >= 3:
-                    name = parts[2].split(' ')[0]
-                    if name:
-                        tests.append({'name': name, 'status': 'failed', 'passed': False})
-except:
-    pass
-
-total = len(tests)
-passed = sum(1 for t in tests if t['passed'])
-
-result = {
-    'tests': tests,
-    'summary': {
-        'total': total,
-        'passed': passed,
-        'failed': total - passed,
-        'percentage': round(100 * passed / total) if total > 0 else 0,
-        'marks': round(passed / total, 2) if total > 0 else 0
+    output = ""
+    if os.path.exists('/tmp/pytest_output.txt'):
+        with open('/tmp/pytest_output.txt', 'r') as f:
+            output = f.read()
+    
+    tests = []
+    seen_tests = set()
+    
+    # Match: test_assignment.py::ClassName::test_name PASSED or FAILED
+    for line in output.split('\n'):
+        match = re.search(r'test_assignment\.py::(\w+)::(\w+)\s+(PASSED|FAILED)', line)
+        if match:
+            test_name = match.group(2)
+            if test_name not in seen_tests:
+                seen_tests.add(test_name)
+                status = 'passed' if match.group(3) == 'PASSED' else 'failed'
+                tests.append({
+                    'name': test_name,
+                    'status': status,
+                    'passed': status == 'passed'
+                })
+    
+    total = len(tests)
+    passed = sum(1 for t in tests if t['passed'])
+    failed = total - passed
+    percentage = (passed / total * 100) if total > 0 else 0
+    marks = passed / total if total > 0 else 0
+    
+    result = {
+        'tests': tests,
+        'summary': {
+            'total': total,
+            'passed': passed,
+            'failed': failed,
+            'percentage': round(percentage, 1),
+            'marks': round(marks, 2)
+        }
     }
-}
+    
+    if total < 16:
+        result['note'] = 'Partial execution - portal may have timeout'
 
-print(json.dumps(result))
+except Exception as e:
+    result = {
+        'tests': [],
+        'summary': {'total': 0, 'passed': 0, 'failed': 0, 'percentage': 0, 'marks': 0},
+        'error': str(e)
+    }
+
+sys.stdout.write(json.dumps(result, indent=2))
+sys.stdout.write('\n')
+sys.stdout.flush()
+
 with open('/app/results.json', 'w') as f:
-    json.dump(result, f)
-PYEOF
+    json.dump(result, f, indent=2)
+
+PYTHON_EOF
 
 exit 0
+
+
 
 
 
