@@ -12,7 +12,7 @@ echo "3" >&2
 
 # Try to run pytest with explicit python path
 echo "4" >&2
-timeout 15 /usr/local/bin/python3 -m pytest test_assignment.py -v --tb=no -p no:cacheprovider 2>&1 > /tmp/pytest_output.txt
+timeout -s KILL 10 /usr/local/bin/python3 -m pytest test_assignment.py -v --tb=no -p no:cacheprovider 2>&1 > /tmp/pytest_output.txt || true
 
 echo "5" >&2
 
@@ -60,8 +60,13 @@ result = {
 print(json.dumps(result, indent=2))
 sys.stdout.flush()
 
+# Write to multiple locations for platform compatibility
 with open('/app/results.json', 'w') as f:
     json.dump(result, f, indent=2)
+
+# Also output as single line to stdout (some platforms prefer this)
+print(json.dumps(result))
+sys.stdout.flush()
 EOF
 
 echo "6" >&2
