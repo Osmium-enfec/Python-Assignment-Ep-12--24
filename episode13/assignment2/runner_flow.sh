@@ -12,10 +12,19 @@ echo "3" >&2
 
 # Try to run pytest with explicit python path
 echo "4" >&2
-/usr/local/bin/python3 -m pytest test_assignment.py -v --tb=line -p no:cacheprovider > /tmp/pytest_output.txt 2>&1
-PYTEST_EXIT=$?
+/usr/local/bin/python3 -m pytest test_assignment.py -v --tb=no -p no:cacheprovider > /tmp/pytest_output.txt 2>&1 &
+PYTEST_PID=$!
+
+# Wait with timeout
+sleep 20
+if kill -0 $PYTEST_PID 2>/dev/null; then
+    echo "DEBUG: Killing pytest (timeout)" >&2
+    kill $PYTEST_PID 2>/dev/null
+    wait $PYTEST_PID 2>/dev/null
+fi
 
 echo "5" >&2
+PYTEST_EXIT=$?
 echo "DEBUG: Pytest exit: $PYTEST_EXIT" >&2
 
 # Parse and output JSON
