@@ -12,20 +12,9 @@ echo "3" >&2
 
 # Try to run pytest with explicit python path
 echo "4" >&2
-/usr/local/bin/python3 -m pytest test_assignment.py -v --tb=no -p no:cacheprovider > /tmp/pytest_output.txt 2>&1 &
-PYTEST_PID=$!
-
-# Wait with timeout
-sleep 20
-if kill -0 $PYTEST_PID 2>/dev/null; then
-    echo "DEBUG: Killing pytest (timeout)" >&2
-    kill $PYTEST_PID 2>/dev/null
-    wait $PYTEST_PID 2>/dev/null
-fi
+timeout 15 /usr/local/bin/python3 -m pytest test_assignment.py -v --tb=no -p no:cacheprovider 2>&1 > /tmp/pytest_output.txt
 
 echo "5" >&2
-PYTEST_EXIT=$?
-echo "DEBUG: Pytest exit: $PYTEST_EXIT" >&2
 
 # Parse and output JSON
 python3 << 'EOF'
@@ -40,13 +29,13 @@ except:
 
 tests = []
 for line in content.split('\n'):
-    if 'PASSED' in line and 'test_assignment.py' in line:
+    if 'PASSED' in line:
         parts = line.split('::')
         if len(parts) >= 3:
             test_name = parts[2].split(' ')[0]
             if test_name:
                 tests.append({'name': test_name, 'status': 'passed', 'passed': True})
-    elif 'FAILED' in line and 'test_assignment.py' in line:
+    elif 'FAILED' in line:
         parts = line.split('::')
         if len(parts) >= 3:
             test_name = parts[2].split(' ')[0]
